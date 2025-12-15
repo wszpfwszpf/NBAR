@@ -7,8 +7,11 @@ __pycache__/
 *.pyd
 *.log
 
-.idea/
+
+
 .vscode/
+.idea/
+*.iml
 
 # =========================
 # Data / Results (重点)
