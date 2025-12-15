@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+已归档的 S1 命令行包装，仅保留以便历史参考。
+"""
+
 import argparse
 import os
 from typing import Any, Dict, Optional
