@@ -1,80 +1,80 @@
-# Event Stream Denoising for Optical Flow Evaluation
+# 事件流降噪用于光流评估
 
-This repository contains an experimental pipeline for **event stream denoising**, with the primary goal of **improving optical flow quality** rather than preserving perfect event-level structures.
+本仓库用于探索 **事件流降噪是否能够稳定提升下游光流质量**，  
+而非追求事件结构的严格保持或构建通用型降噪器。
 
-The project is currently in a **refactoring and stabilization phase**.
-
----
-
-## Project Goal
-
-The core objective of this project is:
-
-> To investigate whether lightweight event stream denoising strategies can **stably improve downstream optical flow estimation**, even if some true events are removed.
-
-This is **not** intended to be a structure-preserving denoiser or a generic event enhancement framework.
+当前项目处于 **结构重构与流程稳定阶段**。
 
 ---
 
-## Pipeline Overview
+## 项目目标
 
-The current conceptual pipeline is:
+本项目的核心目标是：
 
-Raw Events
+> 在允许一定误删真实事件的前提下，  
+> 验证轻量级事件流降噪策略是否能够 **整体提升光流估计效果**。
+
+本项目 **不是**：
+- 结构保持型事件降噪算法  
+- 通用事件增强或重建方法  
+
+---
+
+## 整体流程
+
+当前的概念性流程如下：
+
+原始事件流
 
 ↓
 
-S1 (optional, aggressive filtering)
+S1（可选，偏激进的过滤）
 
 ↓
 
-S2 (optional, compensation / refinement)
+S2（可选，补偿 / 细化）
 
 ↓
 
-Optical Flow Evaluation
+光流评估
 
-
-- **S1**:  
-  May remove true events. This is acceptable as long as optical flow quality improves overall.
-- **S2**:  
-  Intended as a compensation or refinement stage. It is not necessarily structure-preserving.
-
----
-
-## Key Design Principles
-
-- Event representation is fixed as **(t, x, y, p)**.
-- **Real-time suitability** is prioritized over optimal denoising quality.
-- The project currently avoids:
-  - FFT or heavy frequency-domain analysis
-  - Large or complex neural models
-  - Offline or global optimization modules
-- The focus is on **engineering robustness and empirical validation**, not algorithmic complexity.
+- **S1**：  
+  允许误删真实事件，只要整体光流质量稳定提升即可。
+- **S2**：  
+  用于对 S1 的结果进行补偿或细化，不要求严格保持原始结构。
 
 ---
 
-## Current Status
+## 设计原则与约束
 
-- The codebase is under **structural refactoring**.
-- No new denoising algorithms are introduced at this stage.
-- The goal of refactoring is to:
-  - Stabilize the pipeline structure
-  - Enable plug-and-play S1 / S2 modules
-  - Ensure reproducible experiments
-
----
-
-## Usage (Temporary)
-
-This section will be updated after refactoring is complete.
-
-At the current stage, scripts may be experimental and interfaces are subject to change.
+- 事件表示形式固定为 **(t, x, y, p)**。
+- 优先考虑 **实时性与工程可部署性**。
+- 当前阶段 **刻意避免**：
+  - FFT 等频域分析方法  
+  - 复杂或大规模深度模型  
+  - 离线或全局优化模块  
+- 更关注 **工程可控性与实验可验证性**，而非算法复杂度。
 
 ---
 
-## Notes
+## 当前状态说明
 
-- Intermediate visualizations, images, and generated data are intentionally excluded from version control.
-- This repository prioritizes **clarity of experimental logic** over completeness.
+- 代码正处于 **结构性重构阶段**。
+- 当前重构目标：
+  - 理清代码结构
+  - 明确模块接口
+  - 支持 S1 / S2 的可插拔设计
+- 本阶段 **不引入新的降噪算法或策略**。
 
+---
+
+## 使用说明（临时）
+
+当前接口仍在调整中，具体使用方式将在结构稳定后补充。
+
+---
+
+## 备注
+
+- 所有中间可视化结果、图片、视频及生成数据均不纳入版本管理。
+- 本仓库优先保证 **实验逻辑清晰与可复现性**，而非功能完整性。
