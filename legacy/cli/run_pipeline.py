@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 """
-用于重构回归验证的统一入口脚本，非最终实验脚本。
+已归档的命令行入口脚本，仅供历史参考。
 """
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import sys
 import time
-
-# Allow running the script directly from the repository without installation
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
 from nbar.io import load_npz, save_npz
 from nbar.stages.s1 import run as run_s1
