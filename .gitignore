@@ -38,6 +38,7 @@ __pycache__/
 
 # 输出目录（如果你有固定输出文件夹）
 outputs/
+outputs_regression/
 results/
 runs/
 vis/
