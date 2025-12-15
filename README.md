@@ -68,9 +68,25 @@ S2（可选，补偿 / 细化）
 
 ---
 
-## 使用说明（临时）
+## 使用说明
 
-当前接口仍在调整中，具体使用方式将在结构稳定后补充。
+### PyCharm 一键运行（推荐）
+
+- 打开根目录下的 `test.py`。
+- 根据本地数据路径修改文件顶部的 `INPUT_NPZ`（如有需要可调整 `OUTDIR`）。
+- 直接使用 PyCharm 的 Run/Debug 运行脚本。
+- 脚本会依次执行回归 1（原始事件流直通并进行哈希校验）和回归 2（S1 stage，包含 `w1` 哈希），输出位于 `outputs_regression/` 下的 `raw/` 与 `s1/` 子目录。
+
+### 命令行（可选）
+
+如果需要命令行方式，可调用 `scripts/run_pipeline.py`：
+
+```bash
+python scripts/run_pipeline.py --input <your_input>.npz --outdir outputs_regression --stage raw
+python scripts/run_pipeline.py --input <your_input>.npz --outdir outputs_regression --stage s1
+```
+
+命令行与 PyCharm 入口共用同一套管线逻辑。
 
 ---
 
