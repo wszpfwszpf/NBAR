@@ -1,0 +1,55 @@
+# =========================
+# Python / PyCharm
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+.idea/
+.vscode/
+
+# =========================
+# Data / Results (重点)
+# =========================
+# 图片与视频
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tiff
+*.gif
+*.mp4
+*.avi
+*.mov
+
+# 事件数据 / 中间结果
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+
+# 输出目录（如果你有固定输出文件夹）
+outputs/
+results/
+runs/
+vis/
+visualization/
+videos/
+
+# =========================
+# Experiment artifacts
+# =========================
+wandb/
+tensorboard/
+logs/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
