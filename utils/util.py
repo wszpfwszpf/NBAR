@@ -131,82 +131,19 @@ def assert_events_format(t, x, y, p, W=346, H=260):
 import os
 from typing import Dict, Any, Optional, Tuple
 
+from nbar.io import load_npz as load_events_npz_stream, save_npz as save_events_npz_stream
+from nbar.types import EventStream
+
 
 def load_events_npz(npz_path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, Dict[str, Any]]:
     """
     Load events from a self-descriptive NPZ file.
 
-    Expected fields in NPZ:
-        - t : float64, timestamps (seconds)
-        - x : int32, pixel x
-        - y : int32, pixel y
-        - p : int8, polarity in {-1, +1}
-        - resolution : (W, H)  (optional)
-        - time_unit : string (optional)
-
-    Also preserves any additional metadata fields.
-
-    Returns
-    -------
-    t, x, y, p : np.ndarray
-        Event streams.
-    meta : dict
-        Complete metadata dictionary including all fields from NPZ.
+    Delegates to :func:`nbar.io.load_npz` to preserve existing key handling
+    while keeping downstream behavior unchanged.
     """
-    data = np.load(npz_path, allow_pickle=True)
-
-    required_keys = {"t", "x", "y", "p"}
-    if not required_keys.issubset(data.files):
-        raise KeyError(
-            f"NPZ file {npz_path} must contain keys {required_keys}, "
-            f"but got {set(data.files)}"
-        )
-
-    t = np.asarray(data["t"], dtype=np.float64)
-    x = np.asarray(data["x"], dtype=np.int32)
-    y = np.asarray(data["y"], dtype=np.int32)
-    p = np.asarray(data["p"], dtype=np.int8)
-
-    # 基本一致性检查
-    if not (t.shape == x.shape == y.shape == p.shape):
-        raise ValueError("Loaded t, x, y, p have inconsistent shapes")
-
-    # polarity 检查
-    if not np.all(np.isin(p, [-1, 1])):
-        raise ValueError("Polarity p must be in {-1, +1}")
-
-    # 构建完整的元数据字典
-    meta = {
-        "path": npz_path,
-        "num_events": int(t.size),
-        "t_start": float(t[0]) if t.size > 0 else None,
-        "t_end": float(t[-1]) if t.size > 0 else None,
-    }
-
-    # 保存所有原始字段
-    for key in data.files:
-        if key not in ["t", "x", "y", "p"]:  # 这些已经单独处理
-            value = data[key]
-            # 如果值是numpy数组，转换为Python类型
-            if isinstance(value, np.ndarray):
-                if value.ndim == 0:  # 标量数组
-                    meta[key] = value.item()
-                else:
-                    meta[key] = value
-            else:
-                meta[key] = value
-
-    # 确保有基本的resolution和time_unit字段
-    if "resolution" not in meta:
-        meta["resolution"] = None
-    if "time_unit" not in meta:
-        meta["time_unit"] = None
-
-    # 如果是元组形式的resolution，转换为列表
-    if meta["resolution"] is not None and isinstance(meta["resolution"], tuple):
-        meta["resolution"] = list(meta["resolution"])
-
-    return t, x, y, p, meta
+    events: EventStream = load_events_npz_stream(npz_path)
+    return events.t, events.x, events.y, events.p, events.meta or {}
 
 
 def save_events_npz(
@@ -220,77 +157,19 @@ def save_events_npz(
     """
     Save events to a self-descriptive NPZ file with full metadata.
 
-    Parameters
-    ----------
-    save_path : str
-        Output .npz file path.
-    t : array-like
-        Timestamps (float).
-    x, y : array-like
-        Pixel coordinates.
-    p : array-like
-        Polarity. Will be normalized to {-1, +1}.
-    meta : dict, optional
-        Complete metadata dictionary.
-
     Examples
     --------
     # 直接传递完整的meta字典
     save_events_npz("output.npz", t, x, y, p, meta=meta)
     """
-    # 转换数据类型
-    t = np.asarray(t, dtype=np.float64)
-    x = np.asarray(x, dtype=np.int32)
-    y = np.asarray(y, dtype=np.int32)
-
-    # polarity normalization: {-1, +1}
-    p = np.asarray(p, dtype=np.int8)
-    p_pm = np.where(p > 0, 1, -1).astype(np.int8)
-
-    # 基本一致性检查
-    if not (t.shape == x.shape == y.shape == p_pm.shape):
-        raise ValueError("t, x, y, p must have the same shape")
-
-    # 处理元数据
-    save_dict = {
-        "t": t,
-        "x": x,
-        "y": y,
-        "p": p_pm,
-    }
-
-    # 如果有meta，添加所有字段
-    if meta is not None:
-        for key, value in meta.items():
-            if key not in ["t", "x", "y", "p"]:  # 避免覆盖事件数据
-                # 确保resolution是数组格式
-                if key == "resolution" and value is not None:
-                    save_dict[key] = np.asarray(value, dtype=np.int32)
-                else:
-                    save_dict[key] = value
-    else:
-        # 如果没有meta，添加默认值
-        max_x, max_y = np.max(x), np.max(y)
-        save_dict["resolution"] = np.asarray([max_y + 1, max_x + 1]
-                                             if max_y < max_x else
-                                             [max_x + 1, max_y + 1],
-                                             dtype=np.int32)
-        save_dict["time_unit"] = "seconds"
-
-    # 确保有基本的resolution和time_unit
-    if "resolution" not in save_dict:
-        max_x, max_y = np.max(x), np.max(y)
-        save_dict["resolution"] = np.asarray([max_y + 1, max_x + 1]
-                                             if max_y < max_x else
-                                             [max_x + 1, max_y + 1],
-                                             dtype=np.int32)
-
-    if "time_unit" not in save_dict:
-        save_dict["time_unit"] = "seconds"
-
-    # 保存文件
-    np.savez_compressed(save_path, **save_dict)
-    print(f"Saved {len(t)} events to {save_path}")
+    events = EventStream(
+        t=np.asarray(t, dtype=np.float64),
+        x=np.asarray(x, dtype=np.int32),
+        y=np.asarray(y, dtype=np.int32),
+        p=np.asarray(p, dtype=np.int8),
+        meta=meta,
+    )
+    save_events_npz_stream(save_path, events)
 
 
 def clip_events_npz(in_npz, out_npz, t_start, t_end, assume_sorted=True):
