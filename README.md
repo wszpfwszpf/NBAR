@@ -70,13 +70,16 @@ S2（可选，补偿 / 细化）
 
 ## 使用说明
 
-### PyCharm 一键运行（唯一推荐方式）
+### PyCharm 一键运行（推荐）
 
-- 在 PyCharm 中打开根目录下的 `test.py` 并创建运行/调试配置。
-- 根据本地数据路径修改文件顶部的 `INPUT_NPZ`（如有需要可调整 `OUTDIR`，默认输出到 `outputs_regression/`）。
-- 直接运行脚本，自动依次执行回归 1（原始事件流直通并进行哈希校验）和回归 2（S1 stage，包含 `w1` 哈希），输出位于 `outputs_regression/` 下的 `raw/` 与 `s1/` 子目录。
+1. 打开根目录下的 `S1.py`，根据自己的数据路径修改顶部 `INPUT_NPZ`（默认读取 `data/mvsec_clip_2s.npz`）。直接运行即可自动创建 `outputs/raw/` 和 `outputs/s1/`，并生成 `<name>_raw.npz` 与 `<name>_s1.npz`。
+2. 运行 `visual.py` 或 `analyse.py`，脚本默认会从 `outputs/s1/<name>_s1.npz` 读取并进行可视化/分析，无需额外参数。
+3. 需要对比指标时，可运行 `conpare_stage1.py`；校验输出可运行 `sanity_check_s1.py`；基线仍在 `baselines/` 下可直接运行。
 
-> 说明：历史命令行入口与实验脚本已整体归档到 `legacy/archived/`，不再提供或维护。
+> NPZ 格式支持：
+> - 显式四通道：`t/x/y/p`
+> - `events` 矩阵：`N x 4`，列顺序 `(t, x, y, p)`
+> - 历史字段 `w1/w2` 等长数组会被自动保留（统一读写在 `nbar.io.load_npz/save_npz`）。
 
 ### Minimal repo layout
 
