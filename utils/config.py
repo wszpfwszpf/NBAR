@@ -56,5 +56,15 @@ def get_s1_cfg_dict() -> Dict[str, Any]:
     return asdict(S1)
 
 
-def get_s2_cfg_dict() -> Dict[str, Any]:
-    return asdict(S2)
+# def get_s2_cfg_dict() -> Dict[str, Any]:
+#     return asdict(S2)
+
+def get_s2_cfg_dict():
+    return {
+        "normalize_t0": True,
+        "r": 2,
+        "Tn": 0.003,
+        "tau": 0.001,
+        "theta": 1,
+        "beta": 2,
+    }

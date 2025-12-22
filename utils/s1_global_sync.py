@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 # s1_global_sync.py
 
 from __future__ import annotations
